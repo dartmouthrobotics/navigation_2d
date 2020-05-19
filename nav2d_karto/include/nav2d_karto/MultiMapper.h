@@ -83,6 +83,7 @@ private:
 	bool mPublishPoseGraph;	    // Whether or not to publish the pose graph as marker-message.
 	int mNodesAdded;            // Number of nodes added to the pose graph.
 	int mMinMapSize;            // Minimum map size (# of nodes) needed for localization.
+	bool mUseScanMatching;		// Use Scan matching enabled or not, same value as parameter in Mapper.
 	ros::WallTime mLastMapUpdate;
 
 	// Frames and Topics

@@ -59,7 +59,10 @@ MultiMapper::MultiMapper()
 	int param_i;
 	
 	if(mapperNode.getParam("UseScanMatching", param_b))
+	{
 		mMapper->SetParameters("UseScanMatching", param_b);
+		mUseScanMatching = param_b;
+	}
 		
 	if(mapperNode.getParam("UseScanBarycenter", param_b))
 		mMapper->SetParameters("UseScanBarycenter", param_b);
@@ -311,11 +314,12 @@ void MultiMapper::receiveLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan)
 		}
 		catch(tf::TransformException e)
 		{
-			if (mMapper->GetParameter("UseScanMatching"))
+			if (mUseScanMatching)
 			{
 				// Get the most current pose even if not matching as it will be corrected.
 				try
 				{
+					ROS_WARN("Failed to compute odometry pose at sensor time (%s)", e.what());
 					mTransformListener.lookupTransform(mOffsetFrame, mLaserFrame, ros::Time(0), tfPose);
 				}
 				catch(tf::TransformException e)
@@ -361,7 +365,7 @@ void MultiMapper::receiveLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan)
 			bool ok = true;
 			try
 			{
-				mTransformListener.transformPose(mOffsetFrame, tf::Stamped<tf::Pose>(map_in_robot, ros::Time(0) /*scan->header.stamp*/, mLaserFrame), map_in_odom);
+				mTransformListener.transformPose(mOffsetFrame, tf::Stamped<tf::Pose>(map_in_robot, /*ros::Time(0)*/scan->header.stamp, mLaserFrame), map_in_odom);
 			}
 			catch(tf::TransformException e)
 			{
