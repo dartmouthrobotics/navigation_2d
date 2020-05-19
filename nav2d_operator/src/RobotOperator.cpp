@@ -225,7 +225,7 @@ void RobotOperator::executeCommand()
 	}
 	
 	// Create some Debug-Info
-	evaluateAction(mCurrentDirection, mCurrentVelocity, true);
+	evaluateAction(mCurrentDirection, mCurrentVelocity, false);
 	
 	sensor_msgs::PointCloud* originalCloud = getPointCloud(mCurrentDirection, mDesiredVelocity);
 	sensor_msgs::PointCloud transformedCloud;

@@ -311,15 +311,27 @@ void MultiMapper::receiveLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan)
 		}
 		catch(tf::TransformException e)
 		{
-			try
+			if (mMapper->GetParameter("UseScanMatching"))
 			{
-				mTransformListener.lookupTransform(mOffsetFrame, mLaserFrame, ros::Time(0), tfPose);
+				// Get the most current pose even if not matching as it will be corrected.
+				try
+				{
+					mTransformListener.lookupTransform(mOffsetFrame, mLaserFrame, ros::Time(0), tfPose);
+				}
+				catch(tf::TransformException e)
+				{
+					ROS_WARN("Failed to compute odometry pose, skipping scan (%s)", e.what());
+					return;
+				}
 			}
-			catch(tf::TransformException e)
+			else
 			{
-				ROS_WARN("Failed to compute odometry pose, skipping scan (%s)", e.what());
+				// If no scan matching, then should not integrate that scan as it would result in a noisy map.
+				ROS_WARN_THROTTLE(10, "Failed to compute odometry pose, skipping scan (%s)", e.what());
 				return;
 			}
+			
+			
 		}
 		karto::Pose2 kartoPose = karto::Pose2(tfPose.getOrigin().x(), tfPose.getOrigin().y(), tf::getYaw(tfPose.getRotation()));
 		
