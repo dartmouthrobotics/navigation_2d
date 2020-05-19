@@ -1,6 +1,7 @@
 #include <visualization_msgs/Marker.h>
 #include <nav2d_msgs/RobotPose.h>
 #include <nav2d_karto/MultiMapper.h>
+#include <limits>
 
 // compute linear index for given map coords
 #define MAP_IDX(sx, i, j) ((sx) * (j) + (i))
@@ -42,7 +43,7 @@ MultiMapper::MultiMapper()
 	mScanPublisher = robotNode.advertise<nav2d_msgs::LocalizedScan>(mScanOutputTopic, 100, true);
 	mMapServer = robotNode.advertiseService(mMapService, &MultiMapper::getMap, this);
 	mMapPublisher = robotNode.advertise<nav_msgs::OccupancyGrid>(mMapTopic, 1, true);
-	mLaserSubscriber = robotNode.subscribe(mLaserTopic, 100, &MultiMapper::receiveLaserScan, this);
+	mLaserSubscriber = robotNode.subscribe(mLaserTopic, 1, &MultiMapper::receiveLaserScan, this);
 	mInitialPoseSubscriber = robotNode.subscribe("initialpose", 1, &MultiMapper::receiveInitialPose, this);
 	mOtherRobotsPublisher = robotNode.advertise<nav2d_msgs::RobotPose>("others", 10, true);
 
@@ -235,7 +236,7 @@ karto::LocalizedRangeScan* MultiMapper::createFromRosMessage(const sensor_msgs::
 		}else if( !std::isfinite(*it) && *it < 0)
 		{
 			// Object too close to measure.
-			readings.Add(scan.range_max);
+			readings.Add(std::numeric_limits<float>::quiet_NaN());
 		}else if( !std::isfinite(*it) && *it > 0)
 		{
 			// No objects detected in range.
@@ -243,8 +244,8 @@ karto::LocalizedRangeScan* MultiMapper::createFromRosMessage(const sensor_msgs::
 		}else if( std::isnan(*it) )
 		{
 			// This is an erroneous, invalid, or missing measurement.
-			ROS_WARN_THROTTLE(1,"Laser scan contains nan-values!");
-			readings.Add(scan.range_max);
+			ROS_WARN_THROTTLE(10,"Laser scan contains nan-values!");
+			readings.Add(std::numeric_limits<float>::quiet_NaN());
 		}else
 		{
 			// The sensor reported these measurements as valid, but they are
@@ -641,7 +642,8 @@ void MultiMapper::sendLocalizedScan(const sensor_msgs::LaserScan::ConstPtr& scan
 	rosScan.x = pose.GetX();
 	rosScan.y = pose.GetY();
 	rosScan.yaw = pose.GetHeading();
-	
+
+	rosScan.scan.header.stamp = scan->header.stamp;
 	rosScan.scan.angle_min = scan->angle_min;
 	rosScan.scan.angle_max = scan->angle_max;
 	rosScan.scan.range_min = scan->range_min;
