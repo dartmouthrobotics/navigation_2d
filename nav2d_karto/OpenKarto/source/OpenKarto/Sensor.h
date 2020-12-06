@@ -404,7 +404,7 @@ namespace karto
      * @param flipY whether to flip the y-coordinate (useful for drawing applications with inverted y-coordinates)
      * @return list of points from the given scan
      */
-    const Vector2dList GetPointReadings(LocalizedLaserScan* pLocalizedLaserScan, CoordinateConverter* pCoordinateConverter, kt_bool ignoreThresholdPoints = true, kt_bool flipY = false) const;
+    const Vector2dList GetPointReadings(LocalizedLaserScan* pLocalizedLaserScan, CoordinateConverter* pCoordinateConverter, kt_bool ignoreThresholdPoints = false, kt_bool flipY = false) const;
 
   public:
     /**
