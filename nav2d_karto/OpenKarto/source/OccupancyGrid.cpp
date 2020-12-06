@@ -148,7 +148,7 @@ namespace karto
     Vector2d scanPosition = pScan->GetSensorPose().GetPosition();
 
     // get scan point readings
-    const Vector2dList& rPointReadings = pScan->GetPointReadings(true);
+    const Vector2dList& rPointReadings = pScan->GetPointReadings(false);
     kt_bool scanInGrid = false;
 
     // draw lines from scan position to all point readings 

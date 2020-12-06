@@ -1187,7 +1187,7 @@ namespace karto
 
   Vector2dList ScanMatcher::FindValidPoints(LocalizedLaserScan* pScan, const Vector2d& rViewPoint)
   {
-    const Vector2dList& rPointReadings = pScan->GetPointReadings(true);
+    const Vector2dList& rPointReadings = pScan->GetPointReadings(false);
     
     // points must be at least 10 cm away when making comparisons of inside/outside of viewpoint
     const kt_double minSquareDistance = math::Square(0.1); // in m^2

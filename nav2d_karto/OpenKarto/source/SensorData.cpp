@@ -125,7 +125,7 @@ namespace karto
     Pose2 scanPose = GetSensorPose();
     
     Vector2d rangePointsSum;
-    const Vector2dList& rPointReadings = GetPointReadings(true);
+    const Vector2dList& rPointReadings = GetPointReadings(false);
 
     // calculate bounding box of scan
     m_BoundingBox = BoundingBox2();
@@ -206,6 +206,8 @@ namespace karto
     kt_int32u numberOfReadings = pLaserRangeFinder->GetNumberOfRangeReadings();
     for (kt_int32u i = 0; i < numberOfReadings; i++)
     {
+      if (std::isnan(rRangeReadings[i]))
+        continue;
       kt_double angle = scanPose.GetHeading() + minimumAngle + i * angularResolution;
       kt_double rangeReading = rRangeReadings[i];
       
